@@ -1,91 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
-    <!-- Bootstrap core JavaScript -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-110659597-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-110659597-1');
-    </script>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Vilas Magare</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom fonts for this template -->
-    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Cabin:700' rel='stylesheet' type='text/css'>
-
-    <!-- Custom styles for this template -->
-    <link href="css/grayscale.min.css" rel="stylesheet">
-
-  </head>
-
-  <body id="page-top">
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-      <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="#page-top"></a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          Menu
-          <i class="fa fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#about">About</a>
-            </li>
-            <!-- <li class="nav-item">
-            </li> -->
-            <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#contact">Contact</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Intro Header -->
-    <header class="masthead">
-      <div class="intro-body">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Simple Scrum Poker</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            .container {
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                width: 90%;
+                max-width: 800px;
+            }
+            h1,
+            h2 {
+                text-align: center;
+                color: #333;
+            }
+            .controls,
+            .participants-section,
+            .cards,
+            .results {
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #eee;
+            }
+            .controls:last-child,
+            .participants-section:last-child,
+            .cards:last-child,
+            .results:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            .cards {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .card {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 15px 20px;
+                cursor: pointer;
+                background-color: #e9e9e9;
+                font-size: 1.2em;
+                min-width: 50px;
+                text-align: center;
+                transition: background-color 0.3s, transform 0.2s;
+            }
+            .card:hover {
+                background-color: #dcdcdc;
+            }
+            .card.selected {
+                background-color: #4caf50;
+                color: white;
+                border-color: #367c39;
+                transform: scale(1.1);
+            }
+            .participant-input {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            #participant-name {
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            button {
+                padding: 10px 15px;
+                cursor: pointer;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 1em;
+                transition: background-color 0.3s;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+            button:disabled {
+                background-color: #cccccc;
+                cursor: not-allowed;
+            }
+            #participants-list,
+            #results-list {
+                list-style: none;
+                padding: 0;
+                margin-top: 15px;
+            }
+            #participants-list li,
+            #results-list li {
+                background-color: #f9f9f9;
+                border: 1px solid #eee;
+                padding: 10px;
+                margin-bottom: 5px;
+                border-radius: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .vote-display {
+                font-weight: bold;
+                min-width: 50px;
+                text-align: right;
+            }
+            .vote-hidden {
+                color: #aaa;
+                font-style: italic;
+            }
+            .vote-revealed {
+                background-color: #e0e0e0;
+                padding: 3px 6px;
+                border-radius: 3px;
+            }
+            .current-selection {
+                text-align: center;
+                margin-top: 15px;
+                font-size: 1.1em;
+                color: #555;
+            }
+            .current-selection span {
+                font-weight: bold;
+                color: #000;
+            }
+        </style>
+    </head>
+    <body>
         <div class="container">
-          <div class="row">
-            <div class="col-lg-8 mx-auto">
-              <h1 class="brand-heading">Vilas Magare</h1>
-              <p class="intro-text">Programmer | Hacker | Tech Lover</p>
-              <a href="#about" class="btn btn-circle js-scroll-trigger">
-                <i class="fa fa-angle-double-down animated"></i>
-              </a>
+            <h1>Scrum Poker</h1>
+
+            <div class="participants-section">
+                <h2>Participants</h2>
+                <div class="participant-input">
+                    <input type="text" id="participant-name" placeholder="Enter name" />
+                    <button id="add-participant-btn">Add Participant</button>
+                </div>
+                <ul id="participants-list"></ul>
+                <div class="current-selection" id="current-selection-display" style="display: none">
+                    Your selection: <span id="your-vote"></span>
+                </div>
             </div>
-          </div>
+
+            <div class="cards">
+                <h2>Select Your Card</h2>
+                <div id="cards-container" class="cards"></div>
+            </div>
+
+            <div class="results">
+                <h2>Votes</h2>
+                <ul id="results-list"></ul>
+                <p id="average-result" style="text-align: center; font-weight: bold; margin-top: 15px"></p>
+            </div>
+
+            <div class="controls" style="text-align: center">
+                <button id="reveal-btn" disabled>Reveal Votes</button>
+                <button id="reset-btn">New Round</button>
+            </div>
         </div>
-      </div>
-    </header>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script>
+            const participants = {}; // { name: { vote: null | number | string, hasVoted: false } }
+            let votesRevealed = false;
+            let localUserVote = null; // Track the local user's selected card
 
-    <!-- Plugin JavaScript -->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+            const cardsContainer = document.getElementById('cards-container');
+            const participantNameInput = document.getElementById('participant-name');
+            const addParticipantBtn = document.getElementById('add-participant-btn');
+            const participantsList = document.getElementById('participants-list');
+            const resultsList = document.getElementById('results-list');
+            const revealBtn = document.getElementById('reveal-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const yourVoteDisplay = document.getElementById('your-vote');
+            const currentSelectionDisplay = document.getElementById('current-selection-display');
+            const averageResultDisplay = document.getElementById('average-result');
 
-    <!-- Google Maps API Key - Use your own API key to enable the map feature. More information on the Google Maps API can be found at https://developers.google.com/maps/ -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script>
+            // Available poker cards
+            const cardValues = [0, 1, 2, 3, 5, 8, 13, 20, 40, 100, '?', '☕'];
 
-    <!-- Custom scripts for this template -->
-    <script src="js/grayscale.min.js"></script>
+            // --- Functions ---
 
-  </body>
+            function renderParticipants() {
+                participantsList.innerHTML = '';
+                resultsList.innerHTML = '';
+                Object.keys(participants)
+                    .sort()
+                    .forEach((name) => {
+                        // Add to participants list (for potential removal later, if added)
+                        const liParticipant = document.createElement('li');
+                        liParticipant.textContent = name;
+                        // Add a remove button if needed in future
+                        // const removeBtn = document.createElement('button');
+                        // removeBtn.textContent = 'Remove';
+                        // removeBtn.onclick = () => removeParticipant(name);
+                        // liParticipant.appendChild(removeBtn);
+                        participantsList.appendChild(liParticipant);
 
+                        // Add to results list
+                        const liResult = document.createElement('li');
+                        liResult.dataset.participantName = name; // Store name for easy update
+
+                        const nameSpan = document.createElement('span');
+                        nameSpan.textContent = name;
+
+                        const voteSpan = document.createElement('span');
+                        voteSpan.classList.add('vote-display');
+
+                        if (votesRevealed) {
+                            voteSpan.textContent = participants[name].vote ?? '-';
+                            voteSpan.classList.add('vote-revealed');
+                            if (participants[name].vote === null) {
+                                voteSpan.classList.add('vote-hidden'); // Style null votes even when revealed
+                            }
+                        } else {
+                            if (participants[name].hasVoted) {
+                                voteSpan.textContent = 'Voted';
+                                voteSpan.classList.add('vote-hidden');
+                            } else {
+                                voteSpan.textContent = 'Waiting...';
+                                voteSpan.classList.add('vote-hidden');
+                            }
+                        }
+
+                        liResult.appendChild(nameSpan);
+                        liResult.appendChild(voteSpan);
+                        resultsList.appendChild(liResult);
+                    });
+                updateRevealButtonState();
+            }
+
+            function addParticipant() {
+                const name = participantNameInput.value.trim();
+                if (name && !participants[name]) {
+                    participants[name] = { vote: null, hasVoted: false };
+                    participantNameInput.value = '';
+                    votesRevealed = false; // Adding participant resets reveal state
+                    renderParticipants();
+                    renderCards(); // Re-render cards to clear selection
+                } else if (participants[name]) {
+                    alert('Participant name already exists.');
+                }
+                participantNameInput.focus();
+            }
+
+            function selectCard(value) {
+                if (votesRevealed) {
+                    alert('Votes have been revealed. Start a new round to vote again.');
+                    return;
+                }
+                if (Object.keys(participants).length === 0) {
+                    alert('Please add at least one participant before voting.');
+                    return;
+                }
+
+                // Simple approach: Assume the action is by the 'first' participant or a generic user
+                // In a real multi-user app, you'd know who is clicking.
+                // For this demo, we'll track a single local vote.
+                // If you want to assign votes to specific *added* participants,
+                // you'd need a dropdown or way to select 'who' is voting.
+                // Let's simulate a vote for the *first* participant for simplicity if needed,
+                // or just track a local vote that isn't tied to the list.
+
+                localUserVote = value;
+                participants[Object.keys(participants)[0]].vote = value; // TEMPORARY: Assign to first user for demo
+                participants[Object.keys(participants)[0]].hasVoted = true; // TEMPORARY
+
+                console.log(`Selected: ${value}`); // For debugging
+
+                // Update display for local user's selection
+                yourVoteDisplay.textContent = value;
+                currentSelectionDisplay.style.display = 'block';
+
+                // Visually update selected card
+                renderCards(); // Re-render to show selection highlight
+                renderParticipants(); // Update results list to show 'Voted' status
+            }
+
+            function renderCards() {
+                cardsContainer.innerHTML = ''; // Clear existing cards
+                cardValues.forEach((value) => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.textContent = value;
+                    card.dataset.value = value; // Store value in data attribute
+                    if (localUserVote === value && !votesRevealed) {
+                        card.classList.add('selected');
+                    }
+                    card.addEventListener('click', () => selectCard(value));
+                    cardsContainer.appendChild(card);
+                });
+            }
+
+            function revealVotes() {
+                if (Object.keys(participants).length === 0) return; // No participants
+
+                votesRevealed = true;
+                renderParticipants(); // Re-render results list to show actual votes
+                renderCards(); // Re-render cards to remove selection highlight after reveal
+                revealBtn.disabled = true; // Disable reveal after revealing
+                resetBtn.focus(); // Move focus to reset button
+                calculateAndDisplayAverage(); // Calculate average after revealing
+            }
+
+            function calculateAndDisplayAverage() {
+                let sum = 0;
+                let numericVoteCount = 0;
+                Object.values(participants).forEach((p) => {
+                    const vote = p.vote;
+                    if (typeof vote === 'number' && isFinite(vote)) {
+                        sum += vote;
+                        numericVoteCount++;
+                    }
+                });
+
+                if (numericVoteCount > 0) {
+                    const average = (sum / numericVoteCount).toFixed(1);
+                    averageResultDisplay.textContent = `Average (numeric votes only): ${average}`;
+                } else {
+                    averageResultDisplay.textContent = 'No numeric votes to average.';
+                }
+            }
+
+            function newRound() {
+                votesRevealed = false;
+                localUserVote = null; // Reset local user vote
+                Object.keys(participants).forEach((name) => {
+                    participants[name].vote = null;
+                    participants[name].hasVoted = false;
+                });
+                currentSelectionDisplay.style.display = 'none'; // Hide current selection display
+                averageResultDisplay.textContent = ''; // Clear average
+                renderParticipants();
+                renderCards(); // Re-render cards to remove selection highlight
+                updateRevealButtonState(); // Re-enable reveal button if needed
+                participantNameInput.focus(); // Focus back on name input
+            }
+
+            function updateRevealButtonState() {
+                // Enable reveal button only if there are participants and votes haven't been revealed yet
+                revealBtn.disabled = votesRevealed || Object.keys(participants).length === 0;
+                // Optional: Enable only if *all* participants have voted
+                // const allVoted = Object.values(participants).every(p => p.hasVoted);
+                // revealBtn.disabled = votesRevealed || Object.keys(participants).length === 0 || !allVoted;
+            }
+
+            // --- Event Listeners ---
+            addParticipantBtn.addEventListener('click', addParticipant);
+            participantNameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addParticipant();
+                }
+            });
+            revealBtn.addEventListener('click', revealVotes);
+            resetBtn.addEventListener('click', newRound);
+
+            // --- Initial Setup ---
+            renderCards(); // Create cards on load
+            renderParticipants(); // Render initial empty lists
+            participantNameInput.focus();
+        </script>
+    </body>
 </html>
